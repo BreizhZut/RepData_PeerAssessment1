@@ -141,8 +141,15 @@ To submit the assignment:
 
 2. Commit your `PA1_template.md` and `PA1_template.html` files produced by processing your R markdown file with the `knit2html()` function in R (from the **knitr** package)
 
-3. If your document has figures included (it should) then they should have been placed in the `figure/` directory by default (unless you overrode the default). Add and commit the `figure/` directory to your git repository.
+3. If your document has figures included (it should) then they should have been placed in the `figure/` directory by default (unless you overrode the default). Add and commit the `figure/` directory to your git repository. Defaul directory for the figure is `PA1_template_files/figure-html/`
 
+4. Also uploaded r scripts require to reprocess the data
+	* `readActivity.R` read and preprocess original data
+	* `inputActivity.R` run  `readActivity.R` and replace missing values.
+	*  `histogranTotStepDay.R` displays the histogram of the total number of steps per days. Runs `readActivity.R` if the data frame is not loaded. Prior run of `inputActivity.R` produced the version with replaced missing values.
+	*  `graphActivityPattern.R` displays the activity pattern during the day averaged across all days.  Runs `readActivity.R` if the data frame is not loaded. Prior run of `inputActivity.R` produced the version with replaced missing values.
+	* `graphActivityPatternWeekDayWeekEnd.R` same as `graphActivityPattern.R` with week ends and week days separated in different panels.
+	
 4. Push your `master` branch to GitHub.
 
 5. Submit the URL to your GitHub repository for this assignment on the course web site.

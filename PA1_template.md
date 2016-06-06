@@ -1,17 +1,8 @@
----
-title: "Reproducible Research: Activity Monitoring"
-author: "Dylan Tweed"
-date: "June 3, 2016"
-output: 
-    html_document:
-      keep_md: yes
-      number_sections: yes
-      toc: yes
----
+# Reproducible Research: Activity Monitoring
+Dylan Tweed  
+June 3, 2016  
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+
 
 # Introduction
 
@@ -37,10 +28,18 @@ We quickly describe the data, and detail additional preprocessing that is releva
 
 The original tidy data set was downloaded from [Activity Minotoring data (zip archive 52K)](https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip)
 
-```{r}
+
+```r
 file_Activity <- "activity.csv"
 Activ <- read.csv(file_Activity)
 str(Activ)
+```
+
+```
+## 'data.frame':	17568 obs. of  3 variables:
+##  $ steps   : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ date    : Factor w/ 61 levels "2012-10-01","2012-10-02",..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ interval: int  0 5 10 15 20 25 30 35 40 45 ...
 ```
 
 The variables included in this data set are:
@@ -62,7 +61,8 @@ The the preprocessing we apply first is:
 1. Add a new `factor` entry `$wday` with the corresponding week day.
 1. Add a new `charactor` entry `$md` with the corresponding day written as "mm/dd"
 
-```{r}
+
+```r
 library(lubridate,quietly=TRUE,warn.conflicts = FALSE)
 ## Edit the entries
 ## First convert the date comlumn into date object
@@ -87,6 +87,22 @@ Activ$md   <- as.character(Activ$date,"%m/%d")
 str(Activ)
 ```
 
+```
+## 'data.frame':	17568 obs. of  6 variables:
+##  $ steps   : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ date    : Date, format: "2012-10-01" "2012-10-01" ...
+##  $ interval: chr  "00:00" "00:05" "00:10" "00:15" ...
+##  $ time    :Formal class 'Period' [package "lubridate"] with 6 slots
+##   .. ..@ .Data : num  0 0 0 0 0 0 0 0 0 0 ...
+##   .. ..@ year  : num  0 0 0 0 0 0 0 0 0 0 ...
+##   .. ..@ month : num  0 0 0 0 0 0 0 0 0 0 ...
+##   .. ..@ day   : num  0 0 0 0 0 0 0 0 0 0 ...
+##   .. ..@ hour  : num  0 0 0 0 0 0 0 0 0 0 ...
+##   .. ..@ minute: num  0 5 10 15 20 25 30 35 40 45 ...
+##  $ wday    : Factor w/ 7 levels "Friday","Monday",..: 2 2 2 2 2 2 2 2 2 2 ...
+##  $ md      : chr  "10/01" "10/01" "10/01" "10/01" ...
+```
+
 
 # Total number of steps taken each day
 
@@ -96,7 +112,8 @@ In this section, we ignore the fact that the data contains missing values.
 
 We disrespect the order of the assignment because we wish to plot these values in the histogram.
 
-```{r}
+
+```r
 ## Counting the total number of steps per day after removing NAs.
 noNA       <- !is.na(Activ$steps)
 dayActnoNA <- tapply(Activ$steps[noNA],as.factor(Activ$md[noNA]),sum)
@@ -113,7 +130,8 @@ We apply a selection on `Activ$steps` to remove missing values prior to compute 
 
 In order to compute the data require for the histogram, we don't make any preselection before applying `sum` with `na.rm=TRUE`. 
 
-```{r}
+
+```r
 ## Counting the total number of steps per day
 ## dates with only NA will give 0
 dayAct <- tapply(Activ$steps,as.factor(Activ$md),sum,na.rm=TRUE)
@@ -148,6 +166,8 @@ legend("topleft",
 axis(1,at=mybar[grep("5$",row.names(dayAct))],labels=grep("5$",row.names(dayAct),value=TRUE))
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png)
+
 This histogram represents the total number of steps per day. The horizontal solid lines show the mean and median respectively in green and purple. As both lines overlap, only the median is apparent.The  $1-\sigma$ confidence regions are displayed as long-dashed lines, in green for the standard deviation to the mean and purple for the 68% confidence region.
 This sum may be irrelevant if days contains different fractions of missing values, which would artificially decrease the total for the specific day. We address this question in a later section.
 
@@ -155,8 +175,8 @@ This sum may be irrelevant if days contains different fractions of missing value
 
 Across all days; 
 
-* we obtain a mean ($\pm$ standard deviation) of `r format(meantot,digits=7,scientific=FALSE)` $\pm$ `r format(sdtot,digits=6,scientic=TRUE)` (as displayed in green in the histogram).
-* we obtain of median of `r format(tot68[2],digits =7,scientific=FALSE)` with the 68% confidence region within `r paste0("[",format(tot68[1],digits=7,scientific=FALSE),", ",format(tot68[3],digits=7,scientific=FALSE),"]")` (as displayed in purple in the histogram).
+* we obtain a mean ($\pm$ standard deviation) of 10766.19 $\pm$ 4269.18 (as displayed in green in the histogram).
+* we obtain of median of 10765 with the 68% confidence region within [7139.48, 14433.52] (as displayed in purple in the histogram).
 
 # Evolution of the number of steps during the day
 
@@ -168,7 +188,8 @@ The figure we generate requires to compute the mean across all days of the test 
 
 ### Computing statistics per time interval
 
-```{r}
+
+```r
 ## Statistics by interval
 ## Create a data frame with mean and standard deviation
 stepbyt <- data.frame(
@@ -186,7 +207,8 @@ stepbyt$tday  <- 1:nrow(stepbyt)
 
 ### Computing statistics per hour
 
-```{r}
+
+```r
 ## Statistics by hour.
 ## factor variable correspondinf to hours instead of 5 mn intervals
 fhour   <- as.factor(substring(as.character.POSIXt(Activ$interval),1,2)) 
@@ -203,7 +225,8 @@ This figure shows the evolution of the number of step during the day. The mean i
 
 ## Average activity pattern during the day
 
-```{r,results="hide",warning=FALSE}
+
+```r
 ## Load plotting library 
 library(Hmisc,warn.conflicts=FALSE,quietly=TRUE)
 ## Plot point with error bar for hourly statistics 
@@ -237,40 +260,25 @@ title(main= "Number of steps accross all days",
 )
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-7-1.png)
+
 The most striking feature of this figure is actually the difference between day time and night. The activity pattern is null before 6am, and very low after 10 pm. This result is obvious, but should be pointed out as a sensible test of the data. 
 
 ## Actvity peak
 
 We can point out that the standard deviation is always greater that the mean, so given the noisiness of the data it may be premature to draw conclusions. 
 
-```{r, echo=FALSE}
-intmax    <- which.max(stepbyt$mean)
-maxint    <- max(stepbyt$mean)
-intlowmax <- intmax
-while(stepbyt$mean[intlowmax]>=0.5*maxint){
-    intlowmax <- intlowmax - 1
-}
-intlowmax <- intlowmax + 1
-names(intlowmax) <- row.names(stepbyt)[intlowmax]
-inthighmax <- intmax
-while(stepbyt$mean[inthighmax]>= 0.5*maxint){
-    inthighmax <- inthighmax + 1
-}
-inthighmax <- inthighmax - 1
-names(inthighmax) <- row.names(stepbyt)[inthighmax]
-span  <- hm(names(inthighmax)) - hm(names(intlowmax))
-span  <- 0.5*(hour(span)*60 + minute(span))
-```
 
-Still the mean show a clear maximum at `r names(intmax)` ranging from `r names(intlowmax)` to `r names(inthighmax)` (half maxima).
 
-This data could suggests that the subject is running between `r hour(hm(names(intlowmax)))` am and `r hour(hm(names(inthighmax)))` am.
+Still the mean show a clear maximum at 08:35 ranging from 08:10 to 09:20 (half maxima).
+
+This data could suggests that the subject is running between 8 am and 9 am.
 
 Supposing the subject actually runs ever day in this time period, the values we obtain are too low. The running stride being of the order of 150 steps per min and walking stride of 75 steps per minute, our corresponding values should be close to 750 steps and 375 steps respectively.  
 If the error bar were small, translating a strict daily routine, we could suppose that the actual data are the average steps per minutes taken over 5 min interval and not the total number of steps. Since the error bars are large, it is more logical to suppose the the values are low due to variations in the activity pattern.
 
 The error bars suggest large variation in the routine, with period of activity being shorter the the width of the peak, not occurring within the sames intervals and not occurring every day.
-We could model this hypothesis, by convolution of a normal distribution of mean `r names(intmax)` and half width half maxima of `r span` minutes to a top hat model of height $\sim$ 750 and widths ranging form 15 to 30 min.
+We could model this hypothesis, by convolution of a normal distribution of mean 08:35 and half width half maxima of 35 minutes to a top hat model of height $\sim$ 750 and widths ranging form 15 to 30 min.
 We could also suppose that the subject is not running every day, this would also have a significant effect on the peak and explain the error bar. It may be relevant to check whether this peak occurs in both weekends and weekday before applying any kind of modeling.
 
 # Compensating for missing values
@@ -287,15 +295,13 @@ Up until now, we neglected the issue of missing values. But they can strongly af
 
 The issue is that we display sum for a data set with a non negligible fraction of missing values. 
 
-```{r,echo=FALSE}
-totrow <- nrow(Activ)
-totna  <- sum(is.na(Activ$steps))
-```
 
-Within this data frame we have `r totrow` measurements among which, `r totna` missing values.
+
+Within this data frame we have 17568 measurements among which, 2304 missing values.
 Meaning that:
 
-```{r, fig.height=3}
+
+```r
 ## Counting the total number of steps per day
 ## dates with only NA will give 0
 NAAct <- tapply(is.na(Activ$steps),as.factor(Activ$md),sum)/tapply(Activ$steps,as.factor(Activ$md),length)
@@ -312,19 +318,24 @@ axis(1,at=mybar[grep("5$",row.names(NAAct))],labels=grep("5$",row.names(NAAct),v
 axis(2,at=seq(0.,1.,by=0.25))
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-10-1.png)
+
 The missing values are located for specific days. There don't seem to be days with both missing and non-missing values. Therefore the histogram of the total number of steps taken each day (figure 1) is relevant, despite that certain days would be missing. Since, we have been careful, the missing days are ignored for the statistics and not replaced by 0, that would lead to an underestimation of both mean and median. 
 
 ## Replacing the missing values
 
 We have a second look at the summary to check how our modification are affected
-```{r,echo = FALSE}
-summary(Activ$steps)
+
+```
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+##    0.00    0.00    0.00   37.38   12.00  806.00    2304
 ```
 
 In order to generate new values for the missing ones. We suppose the the subject has a weekly routine. Each missing value, will be replaced with a random number following a uniform distribution within range of the 70% confidence region [2][slightly better than 68%, still if the sample was larger 68% may prove better suited] for the corresponding day in the week and time interval.
 This method is relevant since we base our model on a low number of values (6 to 8). Replacing the value by the mean would preserve the mean of the daily evolution at the cost of reducing the error bar. Using a normal distribution with the corresponding standard deviation would preserve the mean and the standard deviation, but would lead to negative values, that once deleted would increase the mean and reduce the standard deviation.  
 
-```{r}
+
+```r
 ## First split the data per day
 Activday <- split(Activ,Activ$wday)
 ## loop through each day
@@ -358,9 +369,20 @@ for(Activloc in Activday){
 }
 ```
 
+```
+## [1] "Missing day: 2 Friday"
+## [1] "Missing day: 2 Monday"
+## [1] "Missing day: 1 Saturday"
+## [1] "Missing day: 1 Sunday"
+## [1] "Missing day: 1 Thursday"
+## [1] "Missing day: 1 Wednesday"
+```
+
 We indeed obtained a corrected sample without NAs with the mean being slightly affected. 
-```{r,echo = FALSE}
-summary(Activ$steps)
+
+```
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    0.00    0.00    0.00   37.39   17.00  806.00
 ```
 
 ## Histogram
@@ -368,54 +390,9 @@ summary(Activ$steps)
 We display the same histogram as before with the missing values replaced. 
 Since we use the same plotting function it is not displayed in this document. We also computed the same statistical values before generating the figure.
 
-```{r,echo=FALSE}
-## Counting the total number of steps per day after removing NAs.
-noNA       <- !is.na(Activ$steps)
-dayActnoNA <- tapply(Activ$steps[noNA],as.factor(Activ$md[noNA]),sum)
-## Mean and standard deviation
-meantotnoNA    <- mean(dayActnoNA)
-sdtotnoNA      <- sd(dayActnoNA)
-## Median and 68%
-tot68noNA      <- quantile(dayActnoNA,probs=c(0.16,0.5,0.84))
 
-```
 
-```{r,echo=FALSE}
-## Counting the total number of steps per day
-## dates with only NA will give 0
-dayAct <- tapply(Activ$steps,as.factor(Activ$md),sum,na.rm=TRUE)
-
-## Plotting the histogram
-mybar <- barplot(dayAct,xaxt="n",
-                 main = "Total Activity per day in October November 2012",
-                 sub  = "Missing values replaced with randomly generated numbers",
-                 ylim = c(0,2.5e4),
-                 xlab = "date [mm/dd]",
-                 ylab = "nb of steps",
-                 col = "#0000d0"
-)
-## set colors here
-colmean <- "#008000"
-colmed  <- "#a000a0"
-## draw mean and standart deviation as horizontal lines
-abline(h=meantotnoNA,lwd=2,col=colmean)
-abline(h=meantotnoNA-sdtot,lwd=1.5, lty = "longdash",col=colmean)
-abline(h=meantotnoNA+sdtot,lwd=1.5, lty = "longdash",col=colmean)
-## draw mean and standart deviation as horizontal lines
-abline(h=tot68noNA[2],lwd=2,col=colmed)
-abline(h=tot68noNA[1],lwd=1.5, lty = "longdash",col=colmed)
-abline(h=tot68noNA[3],lwd=1.5, lty = "longdash",col=colmed)
-## a legend
-legend("topleft",
-       bty="n",
-       legend=c("mean","sd","median","68%"),
-       lty=c(1,5,1,5),
-       lwd=c(3,1.5,3,1.5),
-       col=c(colmean,colmean,colmed,colmed)
-)
-## draw and label the axis the way I want, (the barplot was saved as mybar to obtain a matching axis)
-axis(1,at=mybar[grep("5$",row.names(dayAct))],labels=grep("5$",row.names(dayAct),value=TRUE))
-```
+![](PA1_template_files/figure-html/unnamed-chunk-15-1.png)
 
 The main difference is that the days with no values previously displayed as 0 now contains some values. 
 
@@ -424,11 +401,11 @@ The main difference is that the days with no values previously displayed as 0 no
 Across all days containing measurements: 
 
 * The mean and standard deviations are overestimated once missing values are compensated
-    * we obtain a mean ($\pm$ standard deviation) of `r format(meantotnoNA,digits=7,scientific=FALSE)` $\pm$ `r format(sdtotnoNA,digits=6,scientic=TRUE)` (as displayed in green in the histogram).
-    * the previous corresponding values were `r format(meantot,digits=7,scientific=FALSE)` $\pm$ `r format(sdtot,digits=6,scientic=TRUE)`
+    * we obtain a mean ($\pm$ standard deviation) of 10767.02 $\pm$ 4012.43 (as displayed in green in the histogram).
+    * the previous corresponding values were 10766.19 $\pm$ 4269.18
 * The pattern is similar for the median and 68 % confidence region
-    * we obtain of median of `r format(tot68noNA[2],digits =7,scientific=FALSE)` with the 68% confidence region within `r paste0("[",format(tot68noNA[1],digits=7,scientific=FALSE),", ",format(tot68noNA[3],digits=7,scientific=FALSE),"]")` (as displayed in purple in the histogram).
-    * the previous corresponding values were `r format(tot68[2],digits =7,scientific=FALSE)` with the 68% confidence region within `r paste0("[",format(tot68[1],digits=7,scientific=FALSE),", ",format(tot68[3],digits=7,scientific=FALSE),"]")`
+    * we obtain of median of 10645 with the 68% confidence region within [7934.8, 13923.2] (as displayed in purple in the histogram).
+    * the previous corresponding values were 10765 with the 68% confidence region within [7139.48, 14433.52]
 
 Our missing value implementation method, seems quite efficient in conserving estimating the total number of steps per day. 
 
@@ -440,17 +417,32 @@ Since we now can compensate for missing value, we can proceed on studying the ac
 
 We distinguish between weekend and week with an additional `factor` variable `period` with two levels `weekend` and `weekdays`. Arguably we suppose the weekend is limited to Saturday and Sunday.Arguably this criteria may be different in other countries.
 
-```{r}
+
+```r
 Activ$period <- "weekday"
 Activ$period[grep("^S",Activ$wday)] <- "weekend"
 Activ$period <- as.factor(Activ$period)
 tapply(Activ$step,Activ$period,summary)
+```
+
+```
+## $weekday
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    0.00    0.00    0.00   35.49   14.00  806.00 
+## 
+## $weekend
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    0.00    0.00    0.00   42.73   29.00  785.00
+```
+
+```r
 Activsplit <- split(Activ,Activ$period)
 ```
 
 ## Activity patterns
 
-```{r, fig.height=8}
+
+```r
 library(Hmisc)
 par(mfrow=c(2,1))
 
@@ -514,6 +506,8 @@ for(period in names(Activsplit)){
     }
 }
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-17-1.png)
 
 As before, the mean and standard deviations are represented as black solid lines and shaded region for the 5mn interval statistics, and as blue point with error bar for the hourly statistics. 
 
